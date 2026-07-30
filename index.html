@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Загрузчик картинок для World of Animals</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .example {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        #status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        #status.success {
+            display: block;
+            background: #d1fae5;
+            color: #065f46;
+            border: 2px solid #10b981;
+        }
+        
+        #status.error {
+            display: block;
+            background: #fee2e2;
+            color: #991b1b;
+            border: 2px solid #ef4444;
+        }
+        
+        #status.loading {
+            display: block;
+            background: #fef3c7;
+            color: #92400e;
+            border: 2px solid #f59e0b;
+        }
+        
+        .status-icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+        
+        .history {
+            margin-top: 30px;
+            border-top: 2px solid #eee;
+            padding-top: 20px;
+        }
+        
+        .history h3 {
+            color: #555;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+        
+        .history-item .name {
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .history-item .status-badge {
+            font-size: 12px;
+            padding: 2px 10px;
+            border-radius: 20px;
+        }
+        
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐠 Загрузчик картинок</h1>
+        <p class="subtitle">Для игры World of Animals</p>
+        
+        <div class="form-group">
+            <label for="imageUrl">Ссылка на картинку (PNG)</label>
+            <input type="url" id="imageUrl" placeholder="https://example.com/fish.png" value="https://i.postimg.cc/7PM1wWmb/fish-png.png">
+            <div class="example">Пример: https://i.postimg.cc/7PM1wWmb/fish-png.png</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="imageName">Имя файла (будет сохранён как .png)</label>
+            <input type="text" id="imageName" placeholder="fish" value="fish">
+            <div class="example">Введи только имя без расширения. Например: fish → fish.png</div>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn btn-primary" id="downloadBtn">⬇️ Скачать</button>
+            <button class="btn btn-success" id="openFolderBtn">📂 Открыть папку</button>
+        </div>
+        
+        <div id="status"></div>
+        
+        <div class="history">
+            <h3>📜 История загрузок</h3>
+            <div id="historyList"></div>
+        </div>
+        
+        <div class="footer">
+            Все картинки сохраняются в папку с игрой
+        </div>
+    </div>
+
+    <script>
+        // Используем Python-сервер через fetch
+        // Для работы нужен запущенный Python-сервер
+        
+        const statusDiv = document.getElementById('status');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const openFolderBtn = document.getElementById('openFolderBtn');
+        const historyList = document.getElementById('historyList');
+        
+        // Загружаем историю
+        let history = JSON.parse(localStorage.getItem('downloadHistory') || '[]');
+        renderHistory();
+        
+        function showStatus(message, type, icon = '📌') {
+            statusDiv.className = type;
+            statusDiv.innerHTML = `<span class="status-icon">${icon}</span> ${message}`;
+        }
+        
+        function renderHistory() {
+            if (history.length === 0) {
+                historyList.innerHTML = '<div style="color: #999; font-size: 13px;">Пока ничего не скачано</div>';
+                return;
+            }
+            
+            historyList.innerHTML = history.map(item => `
+                <div class="history-item">
+                    <span class="name">${item.name}.png</span>
+                    <span class="status-badge ${item.success ? 'badge-success' : 'badge-error'}">
+                        ${item.success ? '✅ Скачано' : '❌ Ошибка'}
+                    </span>
+                </div>
+            `).join('');
+        }
+        
+        async function downloadImage() {
+            const url = document.getElementById('imageUrl').value.trim();
+            const name = document.getElementById('imageName').value.trim() || 'fish';
+            
+            if (!url) {
+                showStatus('Пожалуйста, введи ссылку на картинку', 'error', '⚠️');
+                return;
+            }
+            
+            if (!url.includes('.png') && !url.includes('.jpg') && !url.includes('.jpeg')) {
+                showStatus('Ссылка должна вести на PNG или JPG картинку', 'error', '⚠️');
+                return;
+            }
+            
+            downloadBtn.disabled = true;
+            downloadBtn.textContent = '⏳ Загрузка...';
+            showStatus('Скачивание... Пожалуйста, подожди', 'loading', '⏳');
+            
+            try {
+                // Отправляем запрос на Python сервер
+                const response = await fetch('/download', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ url: url, name: name })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showStatus(`✅ ${result.message}`, 'success', '✅');
+                    history.push({ name: name, success: true, time: new Date().toLocaleString() });
+                    localStorage.setItem('downloadHistory', JSON.stringify(history));
+                    renderHistory();
+                } else {
+                    showStatus(`❌ ${result.message}`, 'error', '❌');
+                    history.push({ name: name, success: false, time: new Date().toLocaleString() });
+                    localStorage.setItem('downloadHistory', JSON.stringify(history));
+                    renderHistory();
+                }
+            } catch (error) {
+                showStatus(`❌ Ошибка подключения к серверу: ${error.message}`, 'error', '❌');
+                // Добавляем инструкцию по запуску сервера
+                showStatus(`
+                    ❌ Ошибка: Не удалось подключиться к серверу.<br>
+                    <br>
+                    <strong>Чтобы это работало:</strong><br>
+                    1. Скачай файл <strong>server.py</strong> (я его приложу)<br>
+                    2. Запусти его командой: <code>python server.py</code><br>
+                    3. Обнови эту страницу<br>
+                    <br>
+                    Или просто скачай картинку вручную и сохрани как ${name}.png в папке с игрой.
+                `, 'error', '❌');
+            }
+            
+            downloadBtn.disabled = false;
+            downloadBtn.textContent = '⬇️ Скачать';
+        }
+        
+        // Открыть папку с игрой
+        async function openFolder() {
+            try {
+                const response = await fetch('/open-folder');
+                const result = await response.json();
+                if (result.success) {
+                    showStatus('📂 Папка открыта!', 'success', '📂');
+                } else {
+                    showStatus('❌ Не удалось открыть папку', 'error', '❌');
+                }
+            } catch (error) {
+                showStatus('❌ Ошибка: ' + error.message, 'error', '❌');
+            }
+        }
+        
+        downloadBtn.addEventListener('click', downloadImage);
+        openFolderBtn.addEventListener('click', openFolder);
+        
+        // Enter для быстрого скачивания
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                downloadImage();
+            }
+        });
+        
+        console.log('🐠 Загрузчик картинок готов!');
+        console.log('📌 Введи ссылку и имя файла, затем нажми "Скачать"');
+    </script>
+</body>
+</html>
